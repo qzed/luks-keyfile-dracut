@@ -31,6 +31,7 @@ generate_service () {
                 printf -- "\nConflicts=umount.target"
                 printf -- "\nDefaultDependencies=no"
                 printf -- "\nJobTimeoutSec=%s" "$timeout"
+                printf -- "\nIgnoreOnIsolate=true"
 
                 printf -- "\n\n[Service]"
                 printf -- "\nType=oneshot"
@@ -48,6 +49,12 @@ generate_service () {
                 printf -- "[Unit]"
                 printf -- "\nConditionPathExists=!/dev/mapper/luks-%s" "$target_uuid"
         } > "${sd_dir}/${crypto_target_service}.d/drop-in.conf"
+
+        mkdir -p "${sd_dir}/initrd-switch-root.target.d"
+        {
+                printf -- "[Unit]"
+                printf -- "\nWants=luks-2fa@luks\x2d%s.service luks-2fa.target" "$sd_target_uuid"
+        } > "${sd_dir}/initrd-switch-root.target.d/luks-2fa-${target_uuid}.conf"
 
         ln -sf "$sd_service" "${LUKS_2FA_WANTS}/"
 }
