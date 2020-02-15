@@ -4,8 +4,8 @@ DRACUT_MODULES_D=/usr/lib/dracut/modules.d
 DRACUT_CONF_D=/etc/dracut.conf.d
 
 MODULE_CONF_D=dracut.conf.d
-MODULE_CONF=luks-2fa.conf
-MODULE_DIR=96luks-2fa
+MODULE_CONF=luks-keyfile.conf
+MODULE_DIR=96luks-keyfile
 
 help:
 	@echo make help to show this help

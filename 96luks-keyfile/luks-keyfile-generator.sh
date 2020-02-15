@@ -1,7 +1,7 @@
 #!/bin/bash
 
 NORMAL_DIR="/run/systemd/system"
-LUKS_2FA_WANTS="/etc/systemd/system/luks-2fa.target.wants"
+LUKS_KEYFILE_WANTS="/etc/systemd/system/luks-keyfile.target.wants"
 
 CRYPTSETUP="/usr/lib/systemd/systemd-cryptsetup"
 MOUNT=$(command -v mount)
@@ -17,17 +17,17 @@ generate_service () {
         local sd_target_uuid=$(systemd-escape -p $target_uuid)
         local target_dev="dev-disk-by\x2duuid-${sd_target_uuid}.device"
 
-        local keyfile_mountpoint="/luks-2fa/luks-${target_uuid}"
+        local keyfile_mountpoint="/luks-keyfile/luks-${target_uuid}"
         mkdir -p "$keyfile_mountpoint"
         keyfile_path="${keyfile_mountpoint}/${keyfile_path}"
 
         local crypto_target_service="systemd-cryptsetup@luks\x2d${sd_target_uuid}.service"
-        local sd_service="${sd_dir}/luks-2fa@luks\x2d${sd_target_uuid}.service"
+        local sd_service="${sd_dir}/luks-keyfile@luks\x2d${sd_target_uuid}.service"
         {
                 printf -- "[Unit]"
                 printf -- "\nBindsTo=%s %s" "$keyfile_dev" "$target_dev"
                 printf -- "\nAfter=%s %s cryptsetup-pre.target systemd-journald.socket" "$keyfile_dev" "$target_dev"
-                printf -- "\nBefore=%s umount.target luks-2fa.target" "$crypto_target_service"
+                printf -- "\nBefore=%s umount.target luks-keyfile.target" "$crypto_target_service"
                 printf -- "\nConflicts=umount.target"
                 printf -- "\nDefaultDependencies=no"
                 printf -- "\nJobTimeoutSec=%s" "$timeout"
@@ -53,15 +53,15 @@ generate_service () {
         mkdir -p "${sd_dir}/initrd-switch-root.target.d"
         {
                 printf -- "[Unit]"
-                printf -- "\nWants=luks-2fa@luks\x2d%s.service luks-2fa.target" "$sd_target_uuid"
-        } > "${sd_dir}/initrd-switch-root.target.d/luks-2fa-${target_uuid}.conf"
+                printf -- "\nWants=luks-keyfile@luks\x2d%s.service luks-keyfile.target" "$sd_target_uuid"
+        } > "${sd_dir}/initrd-switch-root.target.d/luks-keyfile-${target_uuid}.conf"
 
-        ln -sf "$sd_service" "${LUKS_2FA_WANTS}/"
+        ln -sf "$sd_service" "${LUKS_KEYFILE_WANTS}/"
 }
 
 parse_cmdline () {
         local CMDLINE
-        IFS=':' read -ra CMDLINE <<<${1#rd.luks.2fa=}
+        IFS=':' read -ra CMDLINE <<<${1#rd.luks.keyfile=}
 
         local __k_uuid=$2
         eval $__k_uuid=${CMDLINE[0]#UUID=}
@@ -85,7 +85,7 @@ generate_from_cmdline () {
 
         for argv in $(cat /proc/cmdline); do
                 case $argv in
-                        rd.luks.2fa=*)
+                        rd.luks.keyfile=*)
                                 parse_cmdline $argv keyfile_uuid keyfile_path target_uuid timeout mountopts
                                 generate_service $keyfile_uuid $keyfile_path $target_uuid $timeout $mountopts
                                 ;;
