@@ -31,6 +31,14 @@ See `/dev/disks/by-uuid/` for the partition UUIDs. These parameters will be tran
 
 ## Setup
 
+### Via Package
+
+There is a pre-built package available for Fedora in the [release](https://github.com/qzed/luks-keyfile-dracut/releases) section.
+This package will automatically install and set-up the module.
+You still need to configure it via the command line as described above.
+
+### Manual Installation
+
 Installation:
 1. Set up your keyfile and make sure it can be used to decrypt the desired partition(s).
 2. Clone this repo (`git clone https://github.com/qzed/luks-keyfile-dracut.git`) and change into its directory.
