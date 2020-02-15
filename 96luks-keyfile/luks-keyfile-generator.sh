@@ -36,7 +36,7 @@ generate_service () {
                 printf -- "\n\n[Service]"
                 printf -- "\nType=oneshot"
                 printf -- "\nRemainAfterExit=yes"
-                printf -- "\nExecStart=${MOUNT} '/dev/disk/by-uuid/%s' %s" "$keyfile_uuid" "$keyfile_mountpoint"
+                printf -- "\nExecStart=${MOUNT} -o ro '/dev/disk/by-uuid/%s' %s" "$keyfile_uuid" "$keyfile_mountpoint"
                 printf -- "\nExecStart=${CRYPTSETUP} attach 'luks-%s' '/dev/disk/by-uuid/%s' '%s' '%s'" "$target_uuid" "$target_uuid" "$keyfile_path" "$mountopts"
                 printf -- "\nExecStart=${UMOUNT} '%s'" "$keyfile_mountpoint"
                 printf -- "\nExecStop=${CRYPTSETUP} detach 'luks-%s'" "$target_uuid"
