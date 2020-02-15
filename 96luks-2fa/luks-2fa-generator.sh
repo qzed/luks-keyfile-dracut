@@ -17,7 +17,7 @@ generate_service () {
         local sd_target_uuid=$(systemd-escape -p $target_uuid)
         local target_dev="dev-disk-by\x2duuid-${sd_target_uuid}.device"
 
-        local keyfile_mountpoint="/luks-2fa/luks-${keyfile_uuid}"
+        local keyfile_mountpoint="/luks-2fa/luks-${target_uuid}"
         mkdir -p "$keyfile_mountpoint"
         keyfile_path="${keyfile_mountpoint}/${keyfile_path}"
 
