@@ -10,7 +10,7 @@ UMOUNT=$(command -v umount)
 TIMEOUT=30
 
 generate_service () {
-        local keyfile_uuid=$1 keyfile_path=$2 target_uuid=$3 timeout=$4 sd_dir=${5:-$NORMAL_DIR}
+        local keyfile_uuid=$1 keyfile_path=$2 target_uuid=$3 timeout=$4 mountopts=$5 sd_dir=${6:-$NORMAL_DIR}
 
         local keyfile_dev="dev-disk-by\x2duuid-$(systemd-escape -p $keyfile_uuid).device"
 
@@ -38,7 +38,7 @@ generate_service () {
                 printf -- "\nRemainAfterExit=yes"
                 printf -- "\nExecStart=${CRYPTSETUP} attach 'luks-%s' '/dev/disk/by-uuid/%s' 'none'" "$keyfile_uuid" "$keyfile_uuid"
                 printf -- "\nExecStart=${MOUNT} '/dev/mapper/luks-%s' %s" "$keyfile_uuid" "$keyfile_mountpoint"
-                printf -- "\nExecStart=${CRYPTSETUP} attach 'luks-%s' '/dev/disk/by-uuid/%s' '%s'" "$target_uuid" "$target_uuid" "$keyfile_path"
+                printf -- "\nExecStart=${CRYPTSETUP} attach 'luks-%s' '/dev/disk/by-uuid/%s' '%s' '%s'" "$target_uuid" "$target_uuid" "$keyfile_path" "$mountopts"
                 printf -- "\nExecStart=${UMOUNT} '%s'" "$keyfile_mountpoint"
                 printf -- "\nExecStart=${CRYPTSETUP} detach 'luks-%s'" "$keyfile_uuid"
                 printf -- "\nExecStop=${CRYPTSETUP} detach 'luks-%s'" "$target_uuid"
@@ -76,6 +76,8 @@ parse_cmdline () {
         local __t=$5
         eval $__t=${CMDLINE[3]:-$TIMEOUT}
 
+        local __t=$6
+        eval $__t=${CMDLINE[4]:-defaults}
 }
 
 generate_from_cmdline () {
@@ -84,8 +86,8 @@ generate_from_cmdline () {
         for argv in $(cat /proc/cmdline); do
                 case $argv in
                         rd.luks.2fa=*)
-                                parse_cmdline $argv keyfile_uuid keyfile_path target_uuid timeout
-                                generate_service $keyfile_uuid $keyfile_path $target_uuid $timeout
+                                parse_cmdline $argv keyfile_uuid keyfile_path target_uuid timeout mountopts
+                                generate_service $keyfile_uuid $keyfile_path $target_uuid $timeout $mountopts
                                 ;;
                 esac
         done
