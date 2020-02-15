@@ -40,7 +40,7 @@ Installation:
    This can, for example, be done by editing `/etc/default/grub` if you use GRUB.
 
 Removal:
-- Run `make clean`.
+- Run `make uninstall`.
   A new initramfs will be created automatically via `dracut -fv`:
 
 ---
