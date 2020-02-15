@@ -36,11 +36,9 @@ generate_service () {
                 printf -- "\n\n[Service]"
                 printf -- "\nType=oneshot"
                 printf -- "\nRemainAfterExit=yes"
-                printf -- "\nExecStart=${CRYPTSETUP} attach 'luks-%s' '/dev/disk/by-uuid/%s' 'none'" "$keyfile_uuid" "$keyfile_uuid"
-                printf -- "\nExecStart=${MOUNT} '/dev/mapper/luks-%s' %s" "$keyfile_uuid" "$keyfile_mountpoint"
+                printf -- "\nExecStart=${MOUNT} '/dev/disk/by-uuid/%s' %s" "$keyfile_uuid" "$keyfile_mountpoint"
                 printf -- "\nExecStart=${CRYPTSETUP} attach 'luks-%s' '/dev/disk/by-uuid/%s' '%s' '%s'" "$target_uuid" "$target_uuid" "$keyfile_path" "$mountopts"
                 printf -- "\nExecStart=${UMOUNT} '%s'" "$keyfile_mountpoint"
-                printf -- "\nExecStart=${CRYPTSETUP} detach 'luks-%s'" "$keyfile_uuid"
                 printf -- "\nExecStop=${CRYPTSETUP} detach 'luks-%s'" "$target_uuid"
         } > "$sd_service"
 
