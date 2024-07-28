@@ -1,5 +1,8 @@
 # luks-keyfile-dracut
 
+> [!WARNING]  
+> This project is obsolete. Use the [`rd.luks.key`](https://wiki.archlinux.org/title/Dm-crypt/System_configuration#rd.luks.key) option or the respective `/etc/crypttab` entry instead.
+
 Fully automated unlock of LUKS encrypted partitions (including root partition) via a key file stored on a USB stick (or any partition in general), no user-interaction required.
 
 Based on https://github.com/raffaeleflorio/luks-2fa-dracut.
